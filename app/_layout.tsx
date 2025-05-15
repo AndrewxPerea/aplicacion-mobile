@@ -1,29 +1,41 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { ClerkProvider, SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
+import Constants from 'expo-constants';
+import { Slot, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { tokenCache } from '@/lib/clerk';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  useEffect(() => {
+    if (!isSignedIn) {
+      router.replace('/login');
+    }
+  }, [isSignedIn]);
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  if (!isSignedIn) {
+    return null; // O un loading indicator
   }
 
+  return <>{children}</>;
+}
+
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <ClerkProvider
+      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}
+      tokenCache={tokenCache}
+    >
+      <SignedIn>
+        <RequireAuth>
+          <Slot />
+        </RequireAuth>
+      </SignedIn>
+      <SignedOut>
+        {/* Muestra la pantalla de login cuando está desconectado */}
+        <Slot />
+      </SignedOut>
+    </ClerkProvider>
   );
 }

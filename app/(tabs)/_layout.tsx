@@ -36,15 +36,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
+          title: 'Explorar',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
   name="profile"  // coincide con el archivo perfile.tsx
   options={{
     title: 'Perfil',  // Título que se muestra en la pestaña
-    tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+    tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
   }}
 />
     </Tabs>
